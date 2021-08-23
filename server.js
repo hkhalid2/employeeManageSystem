@@ -1,9 +1,20 @@
-const express = require('express');
-// Import and require mysql2
+
+// Import and require mysql2/inquirer
 const mysql = require('mysql2');
 const inquirer = require('inquirer');
-// const PORT = process.env.PORT || 3001;
-// const app = express();
+
+//connect to database and log into mysql
+const db = mysql.createConnection(
+    {
+      host: 'localhost',
+      // MySQL username,
+      user: 'root',
+      // MySQL password
+      password: 'Ch1cken?',
+      database: 'company_db'
+    },
+);
+
 
 //Main menu for application
 const mainMenu = () => {
@@ -56,3 +67,66 @@ const mainMenu = () => {
         });
 
 };
+
+const addDepartment = async () => {
+    return inquirer.prompt([
+
+        {
+            type: "input",
+            name: "depname",
+            message: "What is the Department's Name?",
+        }
+    ])
+        //adds new Intern team member's HTML to team array and sends user back to menu
+        .then((answers) => {
+            const newDepartment = `INSERT INTO department (department_name)
+              VALUES ("${answers.depname}");`;
+            
+            db.query(newDepartment, (err, result) => {
+                if (err) {
+                    console.log(err);
+                }
+            })
+            console.log('Added Department to Database')
+            mainMenu();
+        })
+};
+
+const addRole = async () => {
+    return inquirer.prompt([
+
+        {
+            type: "input",
+            name: "rolename",
+            message: "What is the new Role?",   
+        },
+
+        {
+            type: "input",
+            name: "salary",
+            message: "What is this Role's Salary?",
+        },
+
+        {
+            type: "list",
+            name: "depid",
+            message: "What school is this Role's Department?",
+            choices: 
+        },
+    ])
+        //adds new Intern team member's HTML to team array and sends user back to menu
+        .then((answers) => {
+            const newRole = `INSERT INTO department (department_name)
+              VALUES ("${answers.rolename}", "${answers.salary}", "${answers.depid}" );`;
+            
+            db.query(newRole, (err, result) => {
+                if (err) {
+                    console.log(err);
+                }
+            })
+            console.log('Added Role to Database')
+            mainMenu();
+        })
+};
+
+mainMenu();
