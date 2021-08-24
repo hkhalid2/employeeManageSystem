@@ -2,6 +2,7 @@
 // Import and require mysql2/inquirer
 const mysql = require('mysql2');
 const inquirer = require('inquirer');
+const table = require('console.table');
 
 //connect to database and log into mysql
 const db = mysql.createConnection(
@@ -60,13 +61,31 @@ const mainMenu = () => {
                 addDepartment();
             }
             else {
-                console.log('Application terminated.');
+               return console.log('Application terminated.');
             }
 
 
         });
 
 };
+
+const viewRoles = () => {
+    const roleSql =    `SELECT DISTINCT
+                        role.id,
+                        role.title,
+                        department.name AS department,
+                        role.salary
+                        FROM role
+                        JOIN department ON role.department_id = department.id;
+                        `
+    db.query(roleSql, (err, result) => {
+        if (err) {
+            console.log(err);
+        }
+        console.table(result);
+        mainMenu();
+    })
+}
 
 const addDepartment = async () => {
     return inquirer.prompt([
@@ -93,6 +112,9 @@ const addDepartment = async () => {
 };
 
 const addRole = async () => {
+
+    department
+
     return inquirer.prompt([
 
         {
@@ -107,12 +129,7 @@ const addRole = async () => {
             message: "What is this Role's Salary?",
         },
 
-        {
-            type: "list",
-            name: "depid",
-            message: "What school is this Role's Department?",
-            choices: 
-        },
+    
     ])
         //adds new Intern team member's HTML to team array and sends user back to menu
         .then((answers) => {
