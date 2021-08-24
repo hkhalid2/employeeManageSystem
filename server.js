@@ -90,6 +90,22 @@ const employeeRoster = () => {
     })
 }
 
+const viewDepartments = () => {
+    const deptSql =    `SELECT DISTINCT
+                        department.id,
+                        department.name AS department
+                        FROM department
+                        `
+    db.query(deptSql, (err, result) => {
+        if (err) {
+            console.log(err);
+        }
+        console.table(result);
+        mainMenu();
+    })
+}
+
+
 const viewRoles = () => {
     const roleSql =    `SELECT DISTINCT
                         role.id,
@@ -119,7 +135,7 @@ const addDepartment = async () => {
     ])
         //adds new Intern team member's HTML to team array and sends user back to menu
         .then((answers) => {
-            const newDepartment = `INSERT INTO department (department_name)
+            const newDepartment = `INSERT INTO department (name)
               VALUES ("${answers.depname}");`;
             
             db.query(newDepartment, (err, result) => {
