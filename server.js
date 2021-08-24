@@ -69,6 +69,27 @@ const mainMenu = () => {
 
 };
 
+const employeeRoster = () => {
+    const employeeSql =    `SELECT DISTINCT
+                        employee.id,
+                        employee.first_name,
+                        employee.last_name,
+                        role.title AS role,
+                        department.name AS department,
+                        role.salary
+                        FROM employee
+                        JOIN role on employee.role_id = role.id
+                        JOIN department ON role.department_id = department.id;
+                        `
+    db.query(employeeSql, (err, result) => {
+        if (err) {
+            console.log(err);
+        }
+        console.table(result);
+        mainMenu();
+    })
+}
+
 const viewRoles = () => {
     const roleSql =    `SELECT DISTINCT
                         role.id,
