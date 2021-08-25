@@ -77,10 +77,12 @@ const employeeRoster = () => {
                         employee.last_name,
                         roles.title AS roles,
                         department.name AS department,
-                        roles.salary
+                        roles.salary,
+                        CONCAT(manager.first_name, ' ', manager.last_name) AS manager
                         FROM employee
                         JOIN roles on employee.role_id = roles.id
-                        JOIN department ON roles.department_id = department.id;
+                        JOIN department ON roles.department_id = department.id
+                        LEFT JOIN employee manager ON employee.manager_id = manager.id;
                         `
     db.query(employeeSql, (err, result) => {
         if (err) {
@@ -217,7 +219,7 @@ const addEmployee = async ()  => {
     for (i = 0; i < parse.length; i++) {
         var role = { name: parse[i].titles}
         rolelist.push(role)
-    }
+    };
 
 
     //pull possible manager names from db
