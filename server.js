@@ -136,7 +136,7 @@ const addDepartment = async () => {
             message: "What is the Department's Name?",
         }
     ])
-        //adds new Intern team member's HTML to team array and sends user back to menu
+        //adds new Department name to database using a query
         .then((answers) => {
             const newDepartment = `INSERT INTO department (name)
               VALUES ("${answers.depname}");`;
