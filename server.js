@@ -75,12 +75,12 @@ const employeeRoster = () => {
                         employee.id,
                         employee.first_name,
                         employee.last_name,
-                        role.title AS role,
+                        roles.title AS roles,
                         department.name AS department,
-                        role.salary
+                        roles.salary
                         FROM employee
-                        JOIN role on employee.role_id = role.id
-                        JOIN department ON role.department_id = department.id;
+                        JOIN roles on employee.role_id = roles.id
+                        JOIN department ON roles.department_id = department.id;
                         `
     db.query(employeeSql, (err, result) => {
         if (err) {
@@ -109,12 +109,12 @@ const viewDepartments = () => {
 
 const viewRoles = () => {
     const roleSql = `SELECT DISTINCT
-                        role.id,
-                        role.title,
+                        roles.id,
+                        roles.title,
                         department.name AS department,
-                        role.salary
-                        FROM role
-                        JOIN department ON role.department_id = department.id;
+                        roles.salary
+                        FROM roles
+                        JOIN department ON roles.department_id = department.id;
                         `
     db.query(roleSql, (err, result) => {
         if (err) {
@@ -150,7 +150,7 @@ const addDepartment = async () => {
 };
 
 const addRole = async () => {
-
+    //pull department names from db
     const pullDept = `SELECT name
                       FROM department`;
 
@@ -181,8 +181,8 @@ const addRole = async () => {
 
 
     ])
-    //adds new Intern team member's HTML to team array and sends user back to menu
-
+    
+    //searches db to match department with its department id
     const pullDeptID = `SELECT id
                         FROM department
                         WHERE department.name = "${answers.department}";`;
@@ -190,18 +190,104 @@ const addRole = async () => {
     let deptIDquery = await db.promise().query(pullDeptID);
     let deptID = deptIDquery[0][0].id;
 
-    const newRole = `INSERT INTO role (title, salary, department_id)
+    const newRole = `INSERT INTO roles (title, salary, department_id)
               VALUES ("${answers.rolename}", "${answers.salary}", "${deptID}" );`;
-
+    
+    //adds new role too database.
     db.query(newRole, (err, result) => {
         if (err) {
             console.log(err);
         }
     })
-    console.log(answers.department);
+
     console.log('Added Role to Database')
     mainMenu();
 
 };
+
+const addEmployee = async ()  => {
+    //pull role titles from db
+    const pullRole = `SELECT roles.title AS titles
+                      FROM roles;`;
+
+    var roleQuery = await db.promise().query(pullRole);
+    let array = JSON.stringify(roleQuery[0]);
+    let parse = JSON.parse(array);
+    var rolelist = [];
+    for (i = 0; i < parse.length; i++) {
+        var role = { name: parse[i].titles}
+        rolelist.push(role)
+    }
+
+
+    //pull possible manager names from db
+    const pullMan = `SELECT CONCAT(first_name, ' ', last_name) AS name
+                     FROM employee;`;
+
+    var manQuery = await db.promise().query(pullMan);
+    let manlist = manQuery[0];
+
+    answers = await inquirer.prompt([
+
+        {
+            type: "input",
+            name: "firstname",
+            message: "What is the new Employee's firstname?",
+        },
+
+        {
+            type: "input",
+            name: "lastname",
+            message: "What is the new Employee's lastname?",
+        },
+
+        {
+            type: "list",
+            name: "roleselect",
+            message: "What Role is the Employee hired for?",
+            choices: rolelist,
+            initial: 1
+        },
+
+        {
+            type: "list",
+            name: "manage",
+            message: "What manager would the Employee work under?",
+            choices: manlist,
+            initial: 1
+        }
+
+
+    ]);
+    
+    //searches db to match department with its department id
+    const pullRoleID = `SELECT id
+                        FROM roles
+                        WHERE roles.title = "${answers.roleselect}";`;
+
+    let roleIDquery = await db.promise().query(pullRoleID);
+    let roleID = roleIDquery[0][0].id;
+
+    //searches db to match selected manager with their employee id
+    const pullmanID = `SELECT id
+                       FROM employee
+                       WHERE CONCAT(employee.first_name, ' ', employee.last_name) = "${answers.manage}";`;
+
+    let manIDquery = await db.promise().query(pullmanID);
+    let manID = manIDquery[0][0].id;
+
+    const newRole = `INSERT INTO employee (first_name, last_name, role_id, manager_id)
+              VALUES ("${answers.firstname}", "${answers.lastname}", "${roleID}", "${manID}");`;
+    
+    //adds new role too database.
+    db.query(newRole, (err, result) => {
+        if (err) {
+            console.log(err);
+        }
+    })
+
+    console.log('Added Employee to Database')
+    mainMenu();
+}; 
 
 mainMenu();
