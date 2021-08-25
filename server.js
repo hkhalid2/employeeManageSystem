@@ -183,7 +183,7 @@ const addRole = async () => {
 
 
     ])
-    
+
     //searches db to match department with its department id
     const pullDeptID = `SELECT id
                         FROM department
@@ -194,7 +194,7 @@ const addRole = async () => {
 
     const newRole = `INSERT INTO roles (title, salary, department_id)
               VALUES ("${answers.rolename}", "${answers.salary}", "${deptID}" );`;
-    
+
     //adds new role too database.
     db.query(newRole, (err, result) => {
         if (err) {
@@ -207,7 +207,7 @@ const addRole = async () => {
 
 };
 
-const addEmployee = async ()  => {
+const addEmployee = async () => {
     //pull role titles from db
     const pullRole = `SELECT roles.title AS titles
                       FROM roles;`;
@@ -217,7 +217,7 @@ const addEmployee = async ()  => {
     let parse = JSON.parse(array);
     var rolelist = [];
     for (i = 0; i < parse.length; i++) {
-        var role = { name: parse[i].titles}
+        var role = { name: parse[i].titles }
         rolelist.push(role)
     };
 
@@ -261,7 +261,7 @@ const addEmployee = async ()  => {
 
 
     ]);
-    
+
     //searches db to match department with its department id
     const pullRoleID = `SELECT id
                         FROM roles
@@ -278,11 +278,11 @@ const addEmployee = async ()  => {
     let manIDquery = await db.promise().query(pullmanID);
     let manID = manIDquery[0][0].id;
 
-    const newRole = `INSERT INTO employee (first_name, last_name, role_id, manager_id)
+    const newEmployee = `INSERT INTO employee (first_name, last_name, role_id, manager_id)
               VALUES ("${answers.firstname}", "${answers.lastname}", "${roleID}", "${manID}");`;
-    
+
     //adds new role too database.
-    db.query(newRole, (err, result) => {
+    db.query(newEmployee, (err, result) => {
         if (err) {
             console.log(err);
         }
@@ -290,6 +290,80 @@ const addEmployee = async ()  => {
 
     console.log('Added Employee to Database')
     mainMenu();
-}; 
+};
+
+const updateEmployee = async () => {
+    //pull all employees from db
+    const pullEmp = `SELECT CONCAT(first_name, ' ', last_name) AS name
+                    FROM employee;`;
+
+    var EmpQuery = await db.promise().query(pullEmp);
+    let emplist = EmpQuery[0];
+
+    //pull all roles from db
+    const pullRole = `SELECT roles.title AS titles
+                      FROM roles;`;
+
+    var roleQuery = await db.promise().query(pullRole);
+    let array = JSON.stringify(roleQuery[0]);
+    let parse = JSON.parse(array);
+    var rolelist = [];
+    for (i = 0; i < parse.length; i++) {
+        var role = { name: parse[i].titles }
+        rolelist.push(role)
+    };
+
+    answers = await inquirer.prompt([
+
+        {
+            type: "list",
+            name: "empselect",
+            message: "What Employee needs to be updated?",
+            choices: emplist,
+            initial: 1
+        },
+
+        {
+            type: "list",
+            name: "roleselect",
+            message: "What new Role should the employee have?",
+            choices: rolelist,
+            initial: 1
+        }
+
+
+    ]);
+    //get chosen role ID
+    const pullRoleID = `SELECT id
+                        FROM roles
+                        WHERE roles.title = "${answers.roleselect}";`;
+
+    let roleIDquery = await db.promise().query(pullRoleID);
+    let roleID = roleIDquery[0][0].id;
+
+    //get chosen Employee ID
+    const pullempID = `SELECT id
+                       FROM employee
+                       WHERE CONCAT(employee.first_name, ' ', employee.last_name) = "${answers.empselect}";`;
+
+    let empIDquery = await db.promise().query(pullempID);
+    let empID = empIDquery[0][0].id;
+
+    const updateEmployee = `UPDATE employee 
+                            SET employee.role_id = ${roleID}
+                            WHERE employee.id = ${empID};`;
+
+    //adds new role too database.
+    db.query(updateEmployee, (err, result) => {
+        if (err) {
+            console.log(err);
+        }
+    })
+
+
+
+    console.log('Employee Role Updated')
+    mainMenu();
+};
 
 mainMenu();

@@ -12,7 +12,7 @@ VALUES ("Junior Engineer", 65000, 2),
        ("Accountant", 150000, 3);
 
 INSERT INTO employee (first_name, last_name, role_id, manager_id)
-VALUES ("Jim", "Boe",  1, NULL),
-       ("Cathy", "Dingo", 1, NULL),
-       ("Mary", "Jane", 3, NULL);
+VALUES ("Jim", "Boe",  3, NULL),
+       ("Cathy", "Dingo", 2, NULL),
+       ("Mary", "Jane", 1, 1);
 
