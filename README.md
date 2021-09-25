@@ -19,6 +19,13 @@ Inquirer for taking user input in command line, mysql was used to create the dat
 ``node install mysql2``
 ``node install console.table``
 
+## Technologies Used
+* Mysql2
+* Inquirer
+* Console.table
+* Node.js
+* CLI
+
 ## Usage
 ``node server``
 
@@ -35,6 +42,9 @@ MIT License
             
 ## Badges
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+## Link to Deployed App
+Not Applicable since this application runs in the commandline. Instead please view Demo Video below to see functioning.
 
 ### Demo Video
 https://drive.google.com/file/d/1Fe4DarmamzSDAbtJlQOuhaoHLn-ZHpbB/view?usp=sharing
